@@ -1,0 +1,11 @@
+streamlit
+pandas
+numpy
+matplotlib
+xlsxwriter
+joblib
+scapy
+xgboost
+scikit-learn
+altair
+rich
