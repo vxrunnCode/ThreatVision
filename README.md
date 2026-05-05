@@ -22,7 +22,7 @@ ThreatVision is an advanced Security Operations Center (SOC) platform designed f
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/ThreatVision.git
+   git clone https://github.com/vxrunnCode/ThreatVision.git
    cd ThreatVision
    ```
 
