@@ -1,5 +1,6 @@
 # ThreatVision - Real-Time Network Traffic Dashboard
 
+![ThreatVision SOC Dashboard](dashboard.png)
 
 ThreatVision is an advanced Security Operations Center (SOC) platform designed for live network traffic monitoring and multi-stage threat detection. The project integrates real-time packet processing, flow feature extraction, and high-performance machine learning models (XGBoost/RandomForest) to distinguish between benign and malicious network behavior with high confidence.
 
