@@ -969,20 +969,16 @@ class ThreatDetector:
         self.last_load_attempt = None 
          
         # Define feature columns (must match training) 
-        self.basic_features = [ 
-            "Flow_Duration", "Total_Fwd_Packets", "Total_Backward_Packets", 
-            "Total_Length_of_Fwd_Packets", "Total_Length_of_Bwd_Packets", 
-            "Fwd_Packet_Length_Max", "Fwd_Packet_Length_Min", 
-            "Fwd_Packet_Length_Mean", "Fwd_Packet_Length_Std", 
-            "Bwd_Packet_Length_Max", "Bwd_Packet_Length_Min", 
-            "Bwd_Packet_Length_Mean", "Bwd_Packet_Length_Std", 
-            "Flow_Bytes_s", "Flow_Packets_s", 
-            "Flow_IAT_Mean", "Flow_IAT_Std", "Flow_IAT_Max", "Flow_IAT_Min", 
-            "Packet_Length_Variance" 
-        ] 
-         
-        self.extra_features = ["Fwd_Bwd_Packet_Ratio", "Fwd_Bwd_Bytes_Ratio"] 
-        self.feature_columns = self.basic_features + self.extra_features 
+        self.feature_columns = [
+            'Flow_Duration', 'Total_Fwd_Packets', 'Total_Backward_Packets', 
+            'Fwd_Packet_Length_Max', 'Fwd_Packet_Length_Min', 'Fwd_Packet_Length_Mean', 
+            'Fwd_Packet_Length_Std', 'Bwd_Packet_Length_Max', 'Bwd_Packet_Length_Min', 
+            'Bwd_Packet_Length_Mean', 'Bwd_Packet_Length_Std', 'Flow_Bytes_s', 
+            'Flow_Packets_s', 'Flow_IAT_Mean', 'Flow_IAT_Std', 'Flow_IAT_Max', 
+            'Flow_IAT_Min', 'Packet_Length_Variance'
+        ]
+        self.basic_features = self.feature_columns
+        self.extra_features = []
          
         # Try to load model 
         self.load_model() 
