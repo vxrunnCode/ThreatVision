@@ -285,6 +285,12 @@ unsafe_allow_html=True)
             st.markdown(f'<div class="sidebar-stat"><span class="sidebar-stat- label">{label}</span><span class="sidebar-stat-value">{val}</span></div>', unsafe_allow_html=True)
  
         st.markdown("---") 
+        st.markdown('<div class="section-hdr">Integrations</div>', unsafe_allow_html=True)
+        api_key = st.text_input("AbuseIPDB API Key", type="password", key="abuseipdb_key", help="Enter key to verify IP reputation")
+        if api_key:
+            dashboard.ip_tracker.abuseipdb_api_key = api_key
+            
+        st.markdown("---") 
         if st.button("    Reload ML Model", use_container_width=True): 
             if dashboard.threat_detector.load_model(): 
                 st.success("Model reloaded!") 
@@ -500,9 +506,14 @@ unsafe_allow_html=True)
 
 # threatvision_dashboard.py 
  
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 import time 
 import random 
 import threading 
+import requests
 import joblib 
 import numpy as np 
 import pandas as pd 
@@ -769,6 +780,32 @@ class IPThreatTracker:
         self.suspicious_ips = set()                 # IPs flagged as suspicious 
         self.malicious_ips = set()                  # IPs confirmed malicious by ML 
         self.benign_ips = set()                     # IPs confirmed benign by ML 
+        self.abuseipdb_api_key = os.getenv("ABUSEIPDB_API_KEY", "") # Uses key from .env file
+        self.abuseipdb_checked = set()              # IPs already checked
+        self.abuseipdb_scores = {}                  # IP -> AbuseIPDB score
+        
+    def check_abuseipdb(self, ip_address: str):
+        if not self.abuseipdb_api_key or ip_address in self.abuseipdb_checked:
+            return
+        self.abuseipdb_checked.add(ip_address)
+        
+        if ip_address.startswith("192.168.") or ip_address.startswith("10.") or ip_address.startswith("127.") or ip_address.startswith("172."):
+            return
+            
+        def fetch():
+            try:
+                url = 'https://api.abuseipdb.com/api/v2/check'
+                querystring = {'ipAddress': ip_address, 'maxAgeInDays': '90'}
+                headers = {'Accept': 'application/json', 'Key': self.abuseipdb_api_key}
+                response = requests.get(url, headers=headers, params=querystring, timeout=5)
+                if response.status_code == 200:
+                    score = response.json()['data']['abuseConfidenceScore']
+                    self.abuseipdb_scores[ip_address] = score
+                    self.ip_threat_scores[ip_address] = score
+            except Exception:
+                pass
+                
+        threading.Thread(target=fetch, daemon=True).start()
      
     def update_ip_stats(self, packet: dict): 
         """Update IP statistics from a packet""" 
@@ -781,7 +818,6 @@ class IPThreatTracker:
         # Basic heuristic: high packet rate = suspicious 
         if self.ip_packet_counts[src_ip] > 100:  # Threshold 
             self.suspicious_ips.add(src_ip) 
-            self.ip_threat_scores[src_ip] = min(100, self.ip_threat_scores[src_ip] + 5) 
      
     def record_ml_prediction(self, ip_address: str, prediction: str, confidence: float, 
 flow_features: dict): 
@@ -802,12 +838,10 @@ flow_features: dict):
         # Update IP sets 
         if prediction == "MALICIOUS" and confidence > 0.7: 
             self.malicious_ips.add(ip_address) 
-            self.ip_threat_scores[ip_address] = 100  # Max threat score 
             if ip_address in self.benign_ips: 
                 self.benign_ips.remove(ip_address) 
         elif prediction == "BENIGN" and confidence > 0.8: 
             self.benign_ips.add(ip_address) 
-            self.ip_threat_scores[ip_address] = max(0, self.ip_threat_scores[ip_address] - 20) 
             if ip_address in self.malicious_ips: 
                 self.malicious_ips.remove(ip_address) 
          
@@ -816,6 +850,7 @@ flow_features: dict):
      
     def get_ip_analysis(self, ip_address: str) -> Dict[str, any]: 
         """Get comprehensive analysis for an IP""" 
+        self.check_abuseipdb(ip_address)
         predictions = self.ip_predictions.get(ip_address, []) 
          
         if not predictions: 

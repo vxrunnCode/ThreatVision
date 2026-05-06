@@ -1,5 +1,7 @@
 # ThreatVision - Real-Time Network Traffic Dashboard
 
+![ThreatVision SOC Dashboard](dashboard.png)
+
 ThreatVision is an advanced Security Operations Center (SOC) platform designed for live network traffic monitoring and multi-stage threat detection. The project integrates real-time packet processing, flow feature extraction, and high-performance machine learning models (XGBoost/RandomForest) to distinguish between benign and malicious network behavior with high confidence.
 
 ## Technical Stack
@@ -11,6 +13,7 @@ ThreatVision is an advanced Security Operations Center (SOC) platform designed f
 - **Live Traffic Monitoring**: Captures network traffic and visualizes it in real-time.
 - **Machine Learning Threat Detection**: Integrates with a pre-trained model (`threatvision_realistic_temp.pkl`) to detect malicious network flows instantly.
 - **IP Threat Tracking**: Tracks threat scores and ML predictions per IP address to automatically flag suspicious traffic.
+- **AbuseIPDB Integration**: Real-time IP reputation checks using the AbuseIPDB API to verify if flagged IPs are actually malicious or whitelisted.
 - **Real-time Analytics**: Displays key metrics including Packets/sec, Protocol breakdowns, Top Source/Destination IPs, and Live Threat Rates.
 - **Visualizations**: Interactive charts and a live history table that triggers active threat alerts.
 
@@ -22,7 +25,7 @@ ThreatVision is an advanced Security Operations Center (SOC) platform designed f
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/ThreatVision.git
+   git clone https://github.com/vxrunnCode/ThreatVision.git
    cd ThreatVision
    ```
 
@@ -30,6 +33,11 @@ ThreatVision is an advanced Security Operations Center (SOC) platform designed f
    ```bash
    pip install -r requirements.txt
    ```
+
+3. Configure the AbuseIPDB API Key (Optional but recommended):
+   - Create a file named `.env` in the root directory.
+   - Add your API key to the file: `ABUSEIPDB_API_KEY=your_api_key_here`
+   - The `.env` file is ignored by Git, ensuring your key is never pushed to GitHub.
 
 ## Running the Dashboard
 
@@ -40,7 +48,11 @@ streamlit run final_dashboard.py
 
 ## Running the ML Training Pipeline (Optional)
 
-To train a new threat detection model using custom traffic data, run:
+To train a new threat detection model using the `cicddos2019_dataset.csv`, run:
 ```bash
 python train_model.py
+```
+You can verify the model predictions by running:
+```bash
+python verify_model.py
 ```

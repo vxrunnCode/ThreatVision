@@ -9,3 +9,5 @@ xgboost
 scikit-learn
 altair
 rich
+requests
+python-dotenv
