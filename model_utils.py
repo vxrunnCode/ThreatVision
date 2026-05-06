@@ -31,3 +31,4 @@ class TempScaledModel:
 
     def predict(self, X):
         return np.argmax(self.predict_proba(X), axis=1)
+

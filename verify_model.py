@@ -60,3 +60,4 @@ print(f"Total flows: {num_flows}")
 print(f"Normal (BENIGN) flows: {num_benign} ({num_benign/num_flows*100:.2f}%)")
 print(f"Malicious flows: {num_malicious} ({num_malicious/num_flows*100:.2f}%)")
 print("Verify complete!")
+

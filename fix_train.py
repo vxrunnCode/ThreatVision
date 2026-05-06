@@ -89,3 +89,4 @@ text = re.sub(r'def train_intrusion_detection_model\(training_csv, test_csv=None
 
 with open('train_model.py', 'w', encoding='utf-8') as f:
     f.write(text)
+
